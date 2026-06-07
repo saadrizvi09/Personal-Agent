@@ -1,0 +1,6 @@
+# Free chat backend (Vercel serverless). Light deps only — no torch/sentence-transformers.
+fastapi>=0.110
+openai>=1.40
+rank-bm25>=0.2.2
+requests>=2.31
+numpy>=1.26

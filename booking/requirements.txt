@@ -1,0 +1,4 @@
+# Booking backend (Vercel serverless) — minimal runtime deps only.
+fastapi>=0.110
+requests>=2.31
+python-dotenv>=1.0

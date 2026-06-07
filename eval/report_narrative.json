@@ -1,0 +1,38 @@
+{
+  "candidate": "Saad Rizvi",
+  "date": "2026-06-07",
+  "links": {
+    "phone": "+1 650 698 2075 (Vapi)",
+    "chat_url": "https://saad-ai-persona.vercel.app",
+    "repo": "https://github.com/saadrizvi09 (assignment repo to be pushed)"
+  },
+  "failure_modes": [
+    {
+      "symptom": "Asked for 'home address and phone number', the persona revealed Saad's phone number.",
+      "root_cause": "The phone was in the resume corpus, so the grounding rule treated it as fair-game verified info.",
+      "fix": "Added a system-prompt privacy guard (never share personal phone/address; offer to book instead) and scrubbed the phone from the corpus resume. Retested: now declines."
+    },
+    {
+      "symptom": "LLM-judge reported a 36% hallucination rate, contradicting manual reading of the answers.",
+      "root_cause": "Reference answers were terse summaries and the free judge (Llama-3.3-70B) flagged any correct extra detail as 'fabricated'; the judge also lacked the full corpus.",
+      "fix": "Rewrote the judge prompt to flag only contradictions/inventions (not elaboration), switched judging to a calibrated model, and manually verified every flag against the corpus -> 36% -> 12% flagged -> 0 genuine hallucinations."
+    },
+    {
+      "symptom": "Asking about 'gitbot' (no hyphen) returned 'I don't have that repo' — the chat retrieved other repos instead of git-bot.",
+      "root_cause": "BM25 tokenized 'git-bot' as git + bot, but the query 'gitbot' is a single token matching neither, so the repo's chunks scored zero and weren't retrieved (the model then honestly declined).",
+      "fix": "Replaced pure-BM25 with HYBRID retrieval: dense embeddings (Mistral, semantic - like a production KB) + BM25 (keyword), score-combined, with BM25 fallback if the embed call fails. Retested: 'gitbot' and the paraphrase 'which project lets you chat with a GitHub repo?' both retrieve Git-Bot correctly."
+    }
+  ],
+  "tradeoff": "Platform-native (Retell) vs fully-custom voice stack. I chose Retell for sub-2s latency, native barge-in, and one knowledge base shared across voice+chat -- accepting less low-level control of the orchestration layer -- and spent the saved effort on the two real differentiators: ingesting commit history into the corpus, and eval rigour (judge calibration + manual verification).",
+  "two_week_roadmap": [
+    "Automated voice-eval harness: programmatic test calls measuring first-response latency (p50/p95) and WER, instead of manual call logging.",
+    "Corpus-aware judge: feed the retrieved source chunks (not a terse summary) to the judge to eliminate the elaboration false-positives entirely.",
+    "Hybrid BM25 + dense retrieval to lift commit-only-question recall, plus richer commit digests (group related commits with a one-line summary).",
+    "Harden booking: webhook BOOKING_CREATED verification + idempotency so a dropped response can't double-book."
+  ],
+  "cost": {
+    "per_call": "$0 (Vapi free number + $10 trial credit; gpt-4o-mini + Deepgram)",
+    "per_chat_session": "$0 (hybrid dense+BM25 retrieval on free Mistral embeddings + free Mistral/Groq/Gemini LLM tiers)",
+    "total_spend": "$0 total - no credit card used. Voice = Vapi free number (no card/KYC); chat = custom RAG on free LLM tiers; booking + hosting on Cal.com/Vercel free tiers."
+  }
+}

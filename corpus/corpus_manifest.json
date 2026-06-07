@@ -1,0 +1,142 @@
+{
+  "handle": "saadrizvi09",
+  "files": [
+    "repo-ai-powered-cv-generator-backend.md",
+    "repo-ai-powered-cv-generator.md",
+    "repo-algo-quant.md",
+    "repo-algoquant-research-model-dump.md",
+    "repo-assignment.md",
+    "repo-automate-on-edge.md",
+    "repo-bot-tube.md",
+    "repo-cn-backend.md",
+    "repo-cn-frontend.md",
+    "repo-ft.md",
+    "repo-git-bot.md",
+    "repo-llm-trade.md",
+    "repo-markov-switching.md",
+    "repo-mern-project.md",
+    "repo-minor-project-prototype.md",
+    "repo-nomoosh.md",
+    "repo-research.md",
+    "repo-ros-image-to-speech.md",
+    "repo-rusty-chain.md",
+    "repo-spai.md",
+    "repo-strat-backtest.md",
+    "repo-wager-kit-demo.md",
+    "resume.md"
+  ],
+  "repo_count": 22,
+  "chunk_count": 337,
+  "repos": [
+    {
+      "name": "Bot-tube",
+      "commits_ingested": 62,
+      "readme_chars": 10190
+    },
+    {
+      "name": "automate-on-edge",
+      "commits_ingested": 28,
+      "readme_chars": 13394
+    },
+    {
+      "name": "wager-kit-demo",
+      "commits_ingested": 11,
+      "readme_chars": 6605
+    },
+    {
+      "name": "NoMoosh",
+      "commits_ingested": 19,
+      "readme_chars": 0
+    },
+    {
+      "name": "Git-bot",
+      "commits_ingested": 30,
+      "readme_chars": 4914
+    },
+    {
+      "name": "Rusty-chain",
+      "commits_ingested": 1,
+      "readme_chars": 0
+    },
+    {
+      "name": "assignment",
+      "commits_ingested": 2,
+      "readme_chars": 7497
+    },
+    {
+      "name": "SPAI",
+      "commits_ingested": 3,
+      "readme_chars": 4366
+    },
+    {
+      "name": "ft",
+      "commits_ingested": 19,
+      "readme_chars": 2141
+    },
+    {
+      "name": "Algo-Quant",
+      "commits_ingested": 52,
+      "readme_chars": 9110
+    },
+    {
+      "name": "mern-project",
+      "commits_ingested": 0,
+      "readme_chars": 0
+    },
+    {
+      "name": "strat-backtest",
+      "commits_ingested": 29,
+      "readme_chars": 40
+    },
+    {
+      "name": "research",
+      "commits_ingested": 8,
+      "readme_chars": 169
+    },
+    {
+      "name": "cn-backend",
+      "commits_ingested": 34,
+      "readme_chars": 5027
+    },
+    {
+      "name": "cn-frontend",
+      "commits_ingested": 12,
+      "readme_chars": 1450
+    },
+    {
+      "name": "Minor-project-prototype",
+      "commits_ingested": 4,
+      "readme_chars": 16
+    },
+    {
+      "name": "AlgoQuant-research-model-dump",
+      "commits_ingested": 11,
+      "readme_chars": 132
+    },
+    {
+      "name": "ros-image-to-speech",
+      "commits_ingested": 4,
+      "readme_chars": 3688
+    },
+    {
+      "name": "Markov-Switching",
+      "commits_ingested": 5,
+      "readme_chars": 4197
+    },
+    {
+      "name": "LLM-Trade",
+      "commits_ingested": 8,
+      "readme_chars": 1845
+    },
+    {
+      "name": "AI-Powered-CV-Generator",
+      "commits_ingested": 5,
+      "readme_chars": 451
+    },
+    {
+      "name": "AI-Powered-CV-Generator-backend",
+      "commits_ingested": 3,
+      "readme_chars": 2152
+    }
+  ]
+}

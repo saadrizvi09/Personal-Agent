@@ -1,0 +1,39 @@
+# Secrets — NEVER commit these
+.env
+.env.local
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Corpus build artifacts (generated from your real resume + repos at build time)
+corpus/*.md
+corpus/chunks.jsonl
+!corpus/.gitkeep
+
+# Eval run artifacts (regenerate with the harness)
+eval/results/*.jsonl
+eval/results/*.json
+eval/results/*.csv
+eval/report.pdf
+!eval/results/.gitkeep
+
+# Resume source (your real resume — keep out of git unless you intend to publish it)
+resume.txt
+resume.pdf
+resume.md
+resume.docx
+
+# OS / editor / tooling
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/

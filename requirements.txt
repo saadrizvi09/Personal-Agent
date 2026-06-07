@@ -1,0 +1,24 @@
+# ── AI Persona Agent — Python dependencies ───────────────────────────────────
+# One file covers all three components (corpus / booking / eval). Install with:
+#   python -m venv .venv && . .venv/Scripts/activate   (Windows PowerShell: .venv\Scripts\Activate.ps1)
+#   pip install -r requirements.txt
+
+# Corpus pipeline + general HTTP
+requests>=2.31
+python-dotenv>=1.0     # loads .env for corpus/booking/eval scripts
+
+# Booking backend (FastAPI service Retell's custom functions call)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+
+# Eval harness
+openai>=1.40             # LLM judge (OpenAI-compatible: OpenAI / Groq / Gemini / ...)
+jiwer>=3.0               # Word Error Rate for transcription accuracy
+scikit-learn>=1.4        # TF-IDF retrieval-eval fallback (no GPU / model download)
+reportlab>=4.1           # 1-page PDF eval report generator
+numpy>=1.26
+
+# Optional, higher-quality retrieval eval (embedding-based). If absent,
+# retrieval_eval.py falls back to scikit-learn TF-IDF automatically.
+# sentence-transformers>=2.6

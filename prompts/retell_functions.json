@@ -1,0 +1,63 @@
+{
+  "_comment": "Custom function definitions for the Retell voice + chat agents. In Retell, add two Custom Functions and use these name/description/parameters. Point each function's URL at your deployed booking backend, and add an Authorization header 'Bearer <BOOKING_WEBHOOK_SECRET>'. Both agents (voice + chat) share the same two functions.",
+  "functions": [
+    {
+      "name": "get_availability",
+      "description": "Check the candidate's real calendar for open interview slots in a date window. Call this when the user wants to book a meeting and after you have a preferred date range and timezone. Returns a list of open slot start-times to propose to the user. Never invent times — only propose what this returns.",
+      "url": "https://saad-booking-api.vercel.app/functions/get-availability",
+      "speak_during_execution": true,
+      "speak_after_execution": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "description": "Start of the window, ISO date e.g. 2026-06-10. Defaults to tomorrow if omitted."
+          },
+          "end_date": {
+            "type": "string",
+            "description": "End of the window, ISO date e.g. 2026-06-17. Defaults to 7 days after start."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone, e.g. Asia/Kolkata or America/New_York. Ask the user if unsure."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "book_meeting",
+      "description": "Book a confirmed interview on the candidate's real calendar. Call this only after you have the user's full name, email, and a specific slot start-time they chose from get_availability. The backend re-verifies the slot is free before booking and emails a calendar invite. If it returns success:false with alternative slots, offer those instead.",
+      "url": "https://saad-booking-api.vercel.app/functions/book-meeting",
+      "speak_during_execution": true,
+      "speak_after_execution": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "slot_start": {
+            "type": "string",
+            "description": "The exact slot start-time the user chose, ISO 8601, as returned by get_availability."
+          },
+          "attendee_name": {
+            "type": "string",
+            "description": "The user's full name."
+          },
+          "attendee_email": {
+            "type": "string",
+            "description": "The user's email address for the calendar invite."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone for the booking, e.g. Asia/Kolkata."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional: the meeting purpose or anything the user wants noted."
+          }
+        },
+        "required": ["slot_start", "attendee_name", "attendee_email"]
+      }
+    }
+  ]
+}
