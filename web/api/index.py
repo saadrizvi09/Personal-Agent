@@ -282,7 +282,15 @@ def chat(req: ChatReq):
     ctx = retrieve(query)
     context_block = "\n\n".join(
         f"[{c['source']} | {c['heading_path']}]\n{c['text']}" for c in ctx)
-    system = (SYSTEM + "\n\n## All repositories (complete index)\n" + _REPO_INDEX
+    # Current date so the model resolves "tomorrow"/"next week" correctly (and
+    # never books in the past). Default booking timezone is Asia/Kolkata.
+    from datetime import datetime, timezone, timedelta
+    now_ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+    date_line = (f"## Current date\nToday is {now_ist:%A, %Y-%m-%d} (Asia/Kolkata). "
+                 f"Resolve relative dates (today, tomorrow, next week) from this and "
+                 f"ALWAYS use the correct current year when calling get_availability.")
+    system = (SYSTEM + "\n\n" + date_line
+              + "\n\n## All repositories (complete index)\n" + _REPO_INDEX
               + "\n\n## Retrieved knowledge-base context\n" + context_block)
     reply = _run([{"role": "system", "content": system}] + history)
     return {"reply": reply, "retrieved": [c["id"] for c in ctx]}
