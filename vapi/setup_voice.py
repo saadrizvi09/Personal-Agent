@@ -51,6 +51,17 @@ def build_context() -> str:
     resume = Path("corpus/resume.md")
     if resume.exists():
         parts.append(resume.read_text(encoding="utf-8"))
+    # Complete repository index (names + one-line purpose) so the agent can answer
+    # "list all of Saad's projects" — on a call, give the highlights and offer the rest.
+    idx = []
+    for f in sorted(Path("corpus").glob("repo-*.md")):
+        t = f.read_text(encoding="utf-8")[:1200]
+        nm = re.search(r"github\.com/[^/\s]+/([A-Za-z0-9._-]+)", t)
+        name = nm.group(1) if nm else re.sub(r"^repo-|\.md$", "", f.name)
+        pm = re.search(r"\*\*Purpose:\*\*\s*(.+)", t)
+        idx.append(f"- {name}" + (f": {re.sub(chr(92)+'s+',' ',pm.group(1)).strip()[:80]}" if pm else ""))
+    if idx:
+        parts.append(f"## All repositories ({len(idx)} total)\n" + "\n".join(idx))
     for f in sorted(Path("corpus").glob("repo-*.md")):
         md = f.read_text(encoding="utf-8")
         head, _, tail = md.partition("## README")

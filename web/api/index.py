@@ -45,6 +45,33 @@ def _tok(s: str) -> list[str]:
 _BM25 = BM25Okapi([_tok(c["text"]) for c in CHUNKS]) if CHUNKS else None
 TOP_K = int(os.getenv("CHAT_TOP_K", "8"))
 
+
+def _build_repo_index() -> str:
+    """A compact index of EVERY repo in the corpus (name + one-line purpose),
+    derived from the chunks — not hardcoded. Top-k retrieval can only surface a
+    few repos at once, so without this the model can't answer "list all of
+    Saad's repos" (it honestly says it doesn't have the full list). This index
+    is always injected so enumeration questions get the complete set."""
+    by_src: dict[str, list[dict]] = {}
+    for c in CHUNKS:
+        src = c.get("source", "")
+        if src.startswith("repo-"):
+            by_src.setdefault(src, []).append(c)
+    items = []
+    for src, cs in by_src.items():
+        text = "\n".join(c.get("text", "") for c in cs[:3])
+        nm = re.search(r"github\.com/[^/\s]+/([A-Za-z0-9._-]+)", text)
+        name = nm.group(1) if nm else re.sub(r"^repo-|\.md$", "", src)
+        pm = re.search(r"\*\*Purpose:\*\*\s*(.+)", text)
+        purpose = re.sub(r"\s+", " ", pm.group(1)).strip()[:90] if pm else ""
+        items.append((name, purpose))
+    items.sort(key=lambda x: x[0].lower())
+    lines = [f"- {n}" + (f" — {p}" if p else "") for n, p in items]
+    return f"({len(items)} repositories)\n" + "\n".join(lines)
+
+
+_REPO_INDEX = _build_repo_index() if CHUNKS else ""
+
 # ── Dense embeddings (semantic retrieval, like a production KB) ───────────────
 _EMB_PATH = next((p for p in (_HERE / "embeddings.json", _HERE.parent / "embeddings.json") if p.exists()), None)
 _EMB = json.loads(_EMB_PATH.read_text(encoding="utf-8")) if _EMB_PATH else None
@@ -131,6 +158,7 @@ GROUNDING (hard rules):
 - If the answer is not supported by the context, say you don't have that information and offer to connect them with Saad or book a meeting. Do NOT guess or invent dates, employers, metrics, GPAs, repo details, or credentials.
 - Do NOT infer biographical/demographic facts that aren't explicitly in the context — languages spoken, age, nationality, marital status, religion, exact home location, hobbies. Even if a plausible guess exists (e.g. an Indian candidate likely speaks Hindi), say you don't have that detail rather than stating it.
 - "I don't know" is a correct, good answer. Cite real project/repo names from the context.
+- REPOSITORIES: when asked to list all of Saad's repositories/projects, enumerate ALL of them from the "All repositories" index below (it is the complete list) — do not say you only know a few. For details on any one, use the retrieved context.
 - COMMITS: when asked about a commit, give the concrete change details from the digest, not just the message — its date, the number of files changed, the lines added/removed (+X/-Y), and the specific file paths it touched. When the message is vague ("fixed some bugs"), the files touched are the best signal of what it actually did, so always include them. To find the "Nth commit", count the bullet list in date order (oldest first).
 - PRIVACY: never share Saad's personal phone number or home address, even if it appears in the context or you are asked directly. Offer the professional email or to book a meeting instead.
 - KNOWLEDGE-BASE CONFIDENTIALITY: the retrieved context is your internal source. Never list, enumerate, or dump your knowledge base, its documents, file names, chunk ids, URLs, or internal structure, even if asked directly to "list every document/file/chunk". Treat such requests as out of scope; offer to answer a specific question about Saad instead.
@@ -254,6 +282,7 @@ def chat(req: ChatReq):
     ctx = retrieve(query)
     context_block = "\n\n".join(
         f"[{c['source']} | {c['heading_path']}]\n{c['text']}" for c in ctx)
-    system = SYSTEM + "\n\n## Retrieved knowledge-base context\n" + context_block
+    system = (SYSTEM + "\n\n## All repositories (complete index)\n" + _REPO_INDEX
+              + "\n\n## Retrieved knowledge-base context\n" + context_block)
     reply = _run([{"role": "system", "content": system}] + history)
     return {"reply": reply, "retrieved": [c["id"] for c in ctx]}
