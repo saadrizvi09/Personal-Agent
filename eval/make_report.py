@@ -78,10 +78,10 @@ def main():
     nar = json.loads(NARRATIVE.read_text(encoding="utf-8"))
 
     styles = getSampleStyleSheet()
-    h = ParagraphStyle("h", parent=styles["Heading2"], spaceBefore=6, spaceAfter=3,
-                       textColor=colors.HexColor("#1a3c6e"), fontSize=11)
-    small = ParagraphStyle("s", parent=styles["Normal"], fontSize=8, leading=10)
-    body = ParagraphStyle("b", parent=styles["Normal"], fontSize=8.5, leading=11)
+    h = ParagraphStyle("h", parent=styles["Heading2"], spaceBefore=4, spaceAfter=2,
+                       textColor=colors.HexColor("#1a3c6e"), fontSize=10)
+    small = ParagraphStyle("s", parent=styles["Normal"], fontSize=7.5, leading=9)
+    body = ParagraphStyle("b", parent=styles["Normal"], fontSize=8, leading=9.7)
 
     doc = SimpleDocTemplate(str(Path("eval/report.pdf")), pagesize=letter,
                             topMargin=0.5 * inch, bottomMargin=0.4 * inch,
@@ -171,13 +171,13 @@ def _table(data, widths=None):
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a3c6e")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("FONTSIZE", (0, 0), (-1, -1), 7.5),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#c9d3e0")),
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f2f5fa")]),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+        ("TOPPADDING", (0, 0), (-1, -1), 1.5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5),
     ]))
     return t
 
