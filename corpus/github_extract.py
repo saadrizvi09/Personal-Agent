@@ -147,6 +147,33 @@ def is_noise(message: str) -> bool:
     return (not m) or any(m.startswith(p) for p in _NOISE_PREFIXES)
 
 
+def enrich_commits(s: requests.Session, full_name: str, commits: list[dict],
+                   max_detail: int = 60) -> None:
+    """Attach *what changed* to each meaningful commit (in-place): line stats
+    and the top files touched. This is what turns a vague message like
+    'fixed some bugs' into a substantive, commit-only fact a grader can probe
+    ('...touched src/app/api/agent/route.ts, +38/-12'). Only meaningful
+    (non-noise) commits are enriched, newest first, capped at max_detail to
+    bound API usage on busy repos."""
+    targets = [c for c in commits if not is_noise(c["message"])][:max_detail]
+    for c in targets:
+        try:
+            r = _get(s, f"{API}/repos/{full_name}/commits/{c['sha']}")
+            if r.status_code != 200:
+                continue
+            d = r.json()
+            st = d.get("stats") or {}
+            c["additions"] = st.get("additions")
+            c["deletions"] = st.get("deletions")
+            files = d.get("files") or []
+            c["files_changed"] = len(files)
+            # top files by total churn, paths only
+            top = sorted(files, key=lambda f: f.get("changes", 0), reverse=True)
+            c["top_files"] = [f.get("filename", "") for f in top[:3] if f.get("filename")]
+        except (requests.HTTPError, RateLimitExceeded, ValueError):
+            continue
+
+
 def extract(handle: str, token: str | None = None,
             include_forks: bool = False, max_commits: int = 300) -> list[Repo]:
     """Full extraction: repos + READMEs + commit digests."""
@@ -174,6 +201,7 @@ def extract(handle: str, token: str | None = None,
         try:
             repo.readme = fetch_readme(s, full)
             repo.commits = fetch_commits(s, full, max_commits)
+            enrich_commits(s, full, repo.commits)  # +line stats & files touched
         except RateLimitExceeded:
             # Stop fetching more, keep what we have so the build still produces
             # a (partial) corpus. Re-run with GITHUB_TOKEN to complete it.

@@ -37,6 +37,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -161,6 +162,14 @@ def judge_one(providers: list[Provider], row: dict) -> dict:
 
 
 def main():
+    # Windows consoles default to cp1252, which crashes when a model's
+    # justification contains characters like U+2011 (non-breaking hyphen).
+    # Make stdout tolerant so a print can never abort the run before the
+    # summary/judged.jsonl are written.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
     providers = _load_providers()
     if not providers:
         raise SystemExit("Set a judge key. Primary: JUDGE_API_KEY + JUDGE_BASE_URL + "

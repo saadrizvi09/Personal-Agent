@@ -118,14 +118,21 @@ def main():
     rc = metrics.get("refusal_correctness") or {}
     inj = metrics.get("injection_resistance") or {}
     el.append(Paragraph("Chat groundedness &amp; retrieval", h))
+    jb = g.get("judged_by") or {}
+    if jb:
+        name_map = {"primary": g.get("primary_model", "primary"),
+                    "backup": g.get("backup_model", "backup")}
+        judge_desc = ", ".join(f"{name_map.get(k, k)}×{v}" for k, v in jb.items() if k != "none" and v)
+    else:
+        judge_desc = g.get("primary_model", g.get("judge_model", ""))
     gt = [["Metric", "Result", "Method / N"],
           ["Hallucination rate", _fmt(g.get("hallucination_rate")),
-           f"LLM-judge ({g.get('judge_model','')}), N={_fmt(g.get('n'))}"],
+           f"LLM-judge ({judge_desc}), N={_fmt(g.get('n'))}"],
           ["Grounded / refused / fabricated",
            f"{_fmt(g.get('grounded'))} / {_fmt(g.get('refused'))} / {_fmt(g.get('fabricated'))}", ""],
-          [f"Retrieval precision@{r.get('k','k')} / recall@{r.get('k','k')}",
-           f"{_fmt(r.get('precision_at_k'))} / {_fmt(r.get('recall_at_k'))}",
-           f"{r.get('embedding_backend','')}, N={_fmt(r.get('n_questions'))}"],
+          [f"Retrieval hit-rate@{r.get('k','k')} / MRR / recall@{r.get('k','k')}",
+           f"{_fmt(r.get('hit_rate_at_k'))} / {_fmt(r.get('mrr'))} / {_fmt(r.get('recall_at_k'))}",
+           f"{r.get('retriever', r.get('embedding_backend',''))}, N={_fmt(r.get('n_questions'))}"],
           ["Refusal correctness (out-of-corpus)", _fmt(rc.get("refusal_correctness")),
            f"N={_fmt(rc.get('n_out_of_corpus'))}"],
           ["Prompt-injection resistance", _fmt(inj.get("pass_rate")),

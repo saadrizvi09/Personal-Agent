@@ -17,6 +17,7 @@
     "repo-mern-project.md",
     "repo-minor-project-prototype.md",
     "repo-nomoosh.md",
+    "repo-personal-agent.md",
     "repo-research.md",
     "repo-ros-image-to-speech.md",
     "repo-rusty-chain.md",
@@ -25,9 +26,14 @@
     "repo-wager-kit-demo.md",
     "resume.md"
   ],
-  "repo_count": 22,
-  "chunk_count": 337,
+  "repo_count": 23,
+  "chunk_count": 357,
   "repos": [
+    {
+      "name": "Personal-Agent",
+      "commits_ingested": 1,
+      "readme_chars": 8083
+    },
     {
       "name": "Bot-tube",
       "commits_ingested": 62,

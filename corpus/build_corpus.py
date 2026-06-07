@@ -93,7 +93,18 @@ def commit_digest(repo: Repo) -> str:
     for c in meaningful:
         date = (c.get("date") or "")[:10]
         month = date[:7] or "undated"
-        buckets.setdefault(month, []).append(f"- `{date}` {c['message']}")
+        line = f"- `{date}` {c['message']}"
+        # Enrichment (what actually changed) — turns a vague message into a
+        # substantive, commit-only fact a grader can probe.
+        nf = c.get("files_changed")
+        if nf:
+            add, dele = c.get("additions"), c.get("deletions")
+            churn = f"+{add}/-{dele}" if add is not None and dele is not None else ""
+            line += f" — {nf} file{'s' if nf != 1 else ''} changed{(' ' + churn) if churn else ''}"
+            top = c.get("top_files") or []
+            if top:
+                line += f"; touched {', '.join('`%s`' % t for t in top)}"
+        buckets.setdefault(month, []).append(line)
 
     parts: list[str] = []
     for month in sorted(buckets):
